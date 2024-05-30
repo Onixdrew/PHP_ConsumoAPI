@@ -2,21 +2,47 @@ import { useState } from 'react'
 
 
 
-const Tabla = ({ datos,agregarDatos, mensaje} ) => {
+const Tabla = ({ datos,mensaje,agregarDatos,actualizarDatos,eliminarDatos} ) => {
     
     const [nombre, setNombre] = useState('');
     const [precio, setPrecio] = useState('');
     const [categoria, setCategoria] = useState('');
 
+    const [productoActualizar, setProductoActualizar]= useState();
+
+
+    // //////////////////funciones
+
     const enviarDatos = (event) => {
-        event.preventDefault();
-        // Envía los datos al componente padre
-        agregarDatos({ nombre, precio, categoria });
-        // Reinicia los campos del formulario
-        setNombre('');
-        setPrecio('');
-        setCategoria('');
-      };
+      // event.preventDefault()
+      const datosForm={ "nombre":nombre, "precio":precio, "categoria":categoria }
+      agregarDatos(datosForm);
+      
+      // setNombre('');
+      // setPrecio('');
+      // setCategoria('');
+      
+    };
+    
+    const idActualizar=(id)=>{
+      const results = datos.filter(producto => producto.codigo == id);
+      setProductoActualizar(results)
+      
+    }
+
+    const productoUpdate= ()=>{
+      const datosForm={ "nombre":nombre, "precio":precio, "categoria":categoria }
+      actualizarDatos(datosForm)
+      
+    }
+
+
+    const eliminarProducto=(id)=>{
+      eliminarDatos(id)
+      
+      // console.log(id);
+    }
+
 
     return (
     <>
@@ -66,30 +92,57 @@ const Tabla = ({ datos,agregarDatos, mensaje} ) => {
                 <td className="flex justify-evenly mt-4">
                   <button
                     id="actualizar"
-                  
+                    onClick={()=>idActualizar(producto.codigo)}
                     className="bg-white p-2 rounded-lg  "
                     type="button"
                     data-bs-toggle="modal"
-                    data-bs-target="#exampleModal"
+                    data-bs-target="#exampleModal2"
+                    
+                    
                   >
                     <i className="fa-solid fa-pen-to-square text-black  hover:text-blue-500"></i>
                   </button>
 
                   <button
                     id="eliminar"
-                   
                     className="bg-white p-2 rounded-lg"
+                    data-bs-toggle="modal"
+                    data-bs-target="#confirmDeleteModal"
+                    
                   >
                     <i className="fa-solid fa-trash text-black   hover:text-red-500"></i>
                   </button>
+                  
                 </td>
+
+
+                {/* <!-- Modal de confirmación de eliminación --> */}
+                <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar eliminación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        ¿Estás seguro de que deseas eliminar este producto?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" onClick={()=>eliminarProducto(producto.codigo)} id="confirmDeleteButton">Eliminar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-            {/* Modal form agregar */}
+
+      {/* Modal agregar */}
       <div
         className="modal fade bg-primary-subtle"
         id="exampleModal"
@@ -183,6 +236,107 @@ const Tabla = ({ datos,agregarDatos, mensaje} ) => {
           </div>
         </div>
       </div>
+
+
+
+      {/*////////// modal Editar //////////////*/}
+      <div
+        className="modal fade bg-primary-subtle"
+        id="exampleModal2"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog ">
+          <div className="modal-content bg-success text-white fw-medium bg-gradient">
+            <div className="modal-header ">
+              <h1 className="modal-title  fs-5 " id="exampleModalLabel">
+                Actualizar Productos
+              </h1>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <div className="container mt-3">
+                <form onSubmit={productoUpdate}>
+                  <div className="mb-3 mt-3 d-flex flex-column gap-2">
+                    <label htmlFor="codigo"></label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      id="codigo"
+                      name="codigo"
+                      hidden
+                    />
+                  </div>
+                  <div className="mb-3 mt-3 d-flex flex-column gap-2">
+                    <label htmlFor="nombre">Nombre:</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="nombre"
+                      value={productoActualizar?productoActualizar[0].nombre:''}
+                      onChange={(e) => setNombre(e.target.value)}
+                      placeholder="Ingresa el nombre del producto"
+                      name="nombre"
+                    />
+                  </div>
+                  <div className="mb-3 mt-3 d-flex flex-column gap-2">
+                    <label htmlFor="precio">Precio:</label>
+                    <input
+                      type="number"
+                      className="form-control desc"
+                      id="precio"
+                      value={productoActualizar?productoActualizar[0].precio:''}
+                      onChange={(e) => setPrecio(e.target.value)}
+                      name="precio"
+                      placeholder="Ingresa el precio"
+                    />
+                  </div>
+                  <div className="mb-3 mt-3 d-flex flex-column gap-2">
+                    <label htmlFor="categoria">Categoria:</label>
+                    <input
+                      type="text"
+                      className="form-control desc"
+                      id="categoria"
+                      value={productoActualizar?productoActualizar[0].categoria:''}
+                      onChange={(e) => setCategoria(e.target.value)}
+                      name="categoria"
+                      placeholder="Ingresa la categoria"
+                    />
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      id="guardar"
+                      type="submit"
+                      data-bs-dismiss="modal"
+                      onClick={()=>productoUpdate()}
+                      className="btn btn-primary"
+                    >
+                      Guardar
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      data-bs-dismiss="modal"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+      
+
     </>
   );
 };

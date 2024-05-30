@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Tabla from './componentes/tabla'
 import 'tailwindcss/tailwind.css';
+import axios from 'axios';
 
 
 
@@ -19,7 +20,7 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost/PHP_PROYECT2(API)/API/api.php');
+        const response = await fetch('http://localhost/PHP_PROYECT2/API/api.php');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -35,24 +36,29 @@ function App() {
 
 
   // Agregar datos
-  const agregarDatos = async (producto) => {
-    producto.preventDefault();
-    
-
+  const agregarDatos = async (datosForm) => {
+  
     try {
-      const response = await fetch('http://localhost/PHP_PROYECT2(API)/API/api.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(producto),
-      });
 
-      if (!response.ok) {
-        throw new Error('Hubo un problema al agregar el dato.');
-      }
+      // ///////////  Fectch
 
-      setMensaje('Dato agregado exitosamente.');
+      // const response = await fetch('http://localhost/PHP_PROYECT2/API/api.php', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(datosForm),
+        
+      // });
+      
+   
+
+      // //////////  Axios
+
+      await axios.post("http://localhost/PHP_PROYECT2/API/api.php",  JSON.stringify(datosForm) )
+        
+      setMensaje('Producto agregado exitosamente.');
+
     } catch (error) {
       console.error('Error al agregar el dato:', error);
       setMensaje('Hubo un error al agregar el dato. Por favor, inténtalo de nuevo más tarde.');
@@ -60,10 +66,83 @@ function App() {
   };
 
 
+  // Actualizar datos
+
+  const actualizarDatos = async (Productos) => {
+  
+    try {
+
+      // ///////////  Fectch
+      const response = await fetch('http://localhost/PHP_PROYECT2/API/api.php', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Productos),
+        
+      });
+      
+  
+
+      // //////////  Axios
+
+  //     await axios.put("http://localhost/PHP_PROYECT2/API/api.php",  JSON.stringify(Productos),{
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       }
+  //     });
+        
+      setMensaje('Producto actualizado exitosamente.');
+
+  } catch (error) {
+    console.error('Error al agregar el dato:', error);
+    setMensaje('Hubo un error al actualizar el dato. Por favor, inténtalo de nuevo más tarde.');
+  }
+  };
+
+
+  // ////////// eliminar
+
+  const eliminarDatos = async (id) => {
+  
+    try {
+
+      // ///////////  Fetch
+
+      // const response = await fetch('http://localhost/PHP_PROYECT2/API/api.php', {
+      //   method: 'DELETE',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(id),
+        
+      // });
+      
+   
+
+      // //////////  Axios
+      
+      await axios.delete("http://localhost/PHP_PROYECT2/API/api.php", {
+        data:{"codigo":id}, // Incluye el id en el objeto data
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    
+     
+      setMensaje('Producto eliminado exitosamente.');
+      location.reload();
+
+    } catch (error) {
+      console.error('Error al agregar el dato:', error);
+      setMensaje('Hubo un error al eliminar el dato. Por favor, inténtalo de nuevo más tarde.');
+    }
+  };
+
 
   return (
     <>
-      <Tabla datos={data} agregarDatos={agregarDatos} mensaje={mensaje}></Tabla>
+      <Tabla datos={data} agregarDatos={agregarDatos} actualizarDatos={actualizarDatos} eliminarDatos={eliminarDatos} mensaje={mensaje}></Tabla>
     </>
   )
 }
