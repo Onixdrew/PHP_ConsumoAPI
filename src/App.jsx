@@ -36,6 +36,7 @@ function App() {
 
   // Agregar datos
   const agregarDatos = async (producto) => {
+    producto.preventDefault();
     
 
     try {
